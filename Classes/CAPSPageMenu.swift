@@ -35,8 +35,8 @@ open class CAPSPageMenu: UIViewController {
 
     let menuScrollView = UIScrollView()
     let controllerScrollView = UIScrollView()
-    var controllerArray : [UIViewController] = []
-    var menuItems : [MenuItemView] = []
+    @objc open var controllerArray : [UIViewController] = []
+    open var menuItems : [MenuItemView] = []
     var menuItemWidths : [CGFloat] = []
     
     var totalMenuItemWidthIfDifferentWidths : CGFloat = 0.0
@@ -46,7 +46,7 @@ open class CAPSPageMenu: UIViewController {
 
     var selectionIndicatorView : UIView = UIView()
 
-    public var currentPageIndex : Int = 0
+    @objc public var currentPageIndex : Int = 0
     var lastPageIndex : Int = 0
 
     var currentOrientationIsPortrait : Bool = true
@@ -62,7 +62,7 @@ open class CAPSPageMenu: UIViewController {
 
     var pagesAddedDictionary : [Int : Int] = [:]
 
-    open weak var delegate : CAPSPageMenuDelegate?
+    @objc open weak var delegate : CAPSPageMenuDelegate?
 
     var tapTimer : Timer?
 
@@ -83,10 +83,11 @@ open class CAPSPageMenu: UIViewController {
      */
     public init(viewControllers: [UIViewController], frame: CGRect, options: [String: AnyObject]?) {
         super.init(nibName: nil, bundle: nil)
-        
+        selectionIndicatorView.backgroundColor = UIColor.red
         controllerArray = viewControllers
         
         self.view.frame = frame
+       
     }
     
     public convenience init(viewControllers: [UIViewController], frame: CGRect, pageMenuOptions: [CAPSPageMenuOption]?) {
@@ -139,9 +140,9 @@ open class CAPSPageMenu: UIViewController {
         //Setup storyboard
         self.view.frame = CGRect(x: 0, y: 0, width: controller.view.frame.size.width, height: controller.view.frame.size.height)
         if usingStoryboards {
-            controller.addChildViewController(self)
+            controller.addChild(self)
             controller.view.addSubview(self.view)
-            didMove(toParentViewController: controller)
+            didMove(toParent: controller)
         }
         else {
             controller.view.addSubview(self.view)
@@ -204,47 +205,44 @@ extension CAPSPageMenu {
     }
     
     // MARK: - Remove/Add Page
-    func addPageAtIndex(_ index : Int) {
+   @objc open func addPageAtIndex(_ index : Int) {
         // Call didMoveToPage delegate function
         let currentController = controllerArray[index]
         delegate?.willMoveToPage?(currentController, index: index)
         
         let newVC = controllerArray[index]
         
-        newVC.willMove(toParentViewController: self)
+        newVC.willMove(toParent: self)
         
         newVC.view.frame = CGRect(x: self.view.frame.width * CGFloat(index), y: configuration.menuHeight, width: self.view.frame.width, height: self.view.frame.height - configuration.menuHeight)
         
-        self.addChildViewController(newVC)
+        self.addChild(newVC)
         self.controllerScrollView.addSubview(newVC.view)
-        newVC.didMove(toParentViewController: self)
+        newVC.didMove(toParent: self)
     }
     
-    func removePageAtIndex(_ index : Int) {
+   @objc open func removePageAtIndex(_ index : Int) {
         let oldVC = controllerArray[index]
         
-        oldVC.willMove(toParentViewController: nil)
+        oldVC.willMove(toParent: nil)
         
         oldVC.view.removeFromSuperview()
-        oldVC.removeFromParentViewController()
+        oldVC.removeFromParent()
         
-        oldVC.didMove(toParentViewController: nil)
+        oldVC.didMove(toParent: nil)
     }
     
     
     // MARK: - Orientation Change
     
     override open func viewDidLayoutSubviews() {
-        // Configure controller scroll view content size
+  
         controllerScrollView.contentSize = CGSize(width: self.view.frame.width * CGFloat(controllerArray.count), height: self.view.frame.height - configuration.menuHeight)
         
         let oldCurrentOrientationIsPortrait : Bool = currentOrientationIsPortrait
+        currentOrientationIsPortrait = UIDevice.current.orientation.isPortrait
         
-        if UIDevice.current.orientation != UIDeviceOrientation.unknown {
-            currentOrientationIsPortrait = UIDevice.current.orientation.isPortrait || UIDevice.current.orientation.isFlat
-        }
-        
-        if (oldCurrentOrientationIsPortrait && UIDevice.current.orientation.isLandscape) || (!oldCurrentOrientationIsPortrait && (UIDevice.current.orientation.isPortrait || UIDevice.current.orientation.isFlat)) {
+        if (oldCurrentOrientationIsPortrait && UIDevice.current.orientation.isLandscape) || (!oldCurrentOrientationIsPortrait && UIDevice.current.orientation.isPortrait) {
             didLayoutSubviewsAfterRotation = true
             
             //Resize menu items if using as segmented control
@@ -324,7 +322,7 @@ extension CAPSPageMenu {
      
      - parameter index: Index of the page to move to
      */
-    open func moveToPage(_ index: Int) {
+   @objc open func moveToPage(_ index: Int) {
         if index >= 0 && index < controllerArray.count {
             // Update page if changed
             if index != currentPageIndex {
@@ -361,4 +359,56 @@ extension CAPSPageMenu {
             })
         }
     }
+   @objc public func addBadgeLabel(index:Int,Count:Int) {
+        if Count < 1{
+            self.removeBadgeLabel(index: index)
+            return
+        }
+        if index>=0 && index<self.menuItems.count || self.menuItems[index].titleLabel!.frame.height>0 {
+            let labelFrame = self.menuItems[index].titleLabel!.frame
+            let bgImage = UILabel()
+            bgImage.text = "\(Count)"
+            bgImage.backgroundColor = UIColor.red
+            let rect = CGRect(x: labelFrame.maxX+5, y: labelFrame.minY - 5 , width: 10, height: 10)
+            bgImage.frame = rect
+            
+            self.menuItems[index].addSubview(bgImage)
+            bgImage.fadeIn(completion: {
+                (finished: Bool) -> Void in
+                if finished {
+                    // image is showed, do whatever you want
+                }
+            })
+        } else {
+            print("Due to index out of range or titleLabel dont yet setted i cannot set image")
+        }
+    }
+    func removeBadgeLabel(index:Int) {
+        if index>=0 && index<self.menuItems.count {
+            if let bgImage = self.menuItems[index].viewWithTag(9999) {
+                bgImage.fadeOut(completion: {
+                    (finished: Bool) -> Void in
+                    if finished {
+                        
+                        bgImage.removeFromSuperview()
+                    }
+                })
+            }
+        }
+    }
 }
+extension UIView {
+    func fadeIn(duration: TimeInterval = 0.0, delay: TimeInterval = 0.0, completion: @escaping ((Bool) -> Void) = {(finished: Bool) -> Void in}) {
+        UIView.animate(withDuration: duration, delay: delay, options: UIView.AnimationOptions.curveEaseIn, animations: {
+            self.alpha = 1.0
+        }, completion: completion)  }
+    
+    func fadeOut(duration: TimeInterval = 0.0, delay: TimeInterval = 0.0, completion: @escaping (Bool) -> Void = {(finished: Bool) -> Void in}) {
+        UIView.animate(withDuration: duration, delay: delay, options: UIView.AnimationOptions.curveEaseIn, animations: {
+            self.alpha = 0.0
+        }, completion: completion)
+    }
+}
+
+
+
