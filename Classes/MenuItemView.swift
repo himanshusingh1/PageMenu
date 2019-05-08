@@ -8,10 +8,10 @@
 
 import UIKit
 
-class MenuItemView: UIView {
+public class MenuItemView: UIView {
     // MARK: - Menu item view
     
-    var titleLabel : UILabel?
+   public var titleLabel : UILabel?
     var menuItemSeparator : UIView?
     
     func setUpMenuItemView(_ menuItemWidth: CGFloat, menuScrollViewHeight: CGFloat, indicatorHeight: CGFloat, separatorPercentageHeight: CGFloat, separatorWidth: CGFloat, separatorRoundEdges: Bool, menuItemSeparatorColor: UIColor) {
