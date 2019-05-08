@@ -367,11 +367,13 @@ extension CAPSPageMenu {
         if index>=0 && index<self.menuItems.count || self.menuItems[index].titleLabel!.frame.height>0 {
             let labelFrame = self.menuItems[index].titleLabel!.frame
             let bgImage = UILabel()
+            bgImage.font = UIFont.boldSystemFont(ofSize: 12)
+            bgImage.textColor = UIColor.white
             bgImage.text = "\(Count)"
             bgImage.backgroundColor = UIColor.red
             let rect = CGRect(x: labelFrame.width - 25, y:  5 , width: 20, height: 20)
             bgImage.frame = rect
-            
+            bgImage.layer.cornerRadius = 10;
             self.menuItems[index].addSubview(bgImage)
             bgImage.fadeIn(completion: {
                 (finished: Bool) -> Void in
