@@ -360,6 +360,7 @@ extension CAPSPageMenu {
         }
     }
    @objc public func addBadgeLabel(index:Int,Count:Int) {
+        self.removeBadgeLabel(index: index)
         if Count < 1{
             self.removeBadgeLabel(index: index)
             return
@@ -370,6 +371,7 @@ extension CAPSPageMenu {
             bgImage.font = UIFont.boldSystemFont(ofSize: 12)
             bgImage.textColor = UIColor.white
             bgImage.text = "\(Count)"
+            bgImage.textAlignment = .center
             bgImage.backgroundColor = UIColor.red
             let rect = CGRect(x: labelFrame.width - 25, y:  5 , width: 20, height: 20)
             bgImage.frame = rect
