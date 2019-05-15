@@ -391,13 +391,7 @@ extension CAPSPageMenu {
     func removeBadgeLabel(index:Int) {
         if index>=0 && index<self.menuItems.count {
             if let bgImage = self.menuItems[index].viewWithTag(9999) {
-                bgImage.fadeOut(completion: {
-                    (finished: Bool) -> Void in
-                    if finished {
-                        
-                        bgImage.removeFromSuperview()
-                    }
-                })
+                bgImage.removeFromSuperview()
             }
         }
     }
