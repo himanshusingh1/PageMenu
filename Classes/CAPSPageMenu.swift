@@ -371,6 +371,7 @@ extension CAPSPageMenu {
             bgImage.font = UIFont.boldSystemFont(ofSize: 12)
             bgImage.textColor = UIColor.white
             bgImage.text = "\(Count)"
+            bgImage.tag = 9999
             bgImage.textAlignment = .center
             bgImage.backgroundColor = UIColor.red
             let rect = CGRect(x: labelFrame.width - 25, y:  5 , width: 20, height: 20)
