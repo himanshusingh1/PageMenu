@@ -377,13 +377,8 @@ extension CAPSPageMenu {
             let rect = CGRect(x: labelFrame.width - 25, y:  5 , width: 20, height: 20)
             bgImage.frame = rect
             bgImage.layer.cornerRadius = 10;
+            bgImage.layer.masksToBounds = true;
             self.menuItems[index].addSubview(bgImage)
-            bgImage.fadeIn(completion: {
-                (finished: Bool) -> Void in
-                if finished {
-                    // image is showed, do whatever you want
-                }
-            })
         } else {
             print("Due to index out of range or titleLabel dont yet setted i cannot set image")
         }
